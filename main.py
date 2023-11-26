@@ -1,16 +1,22 @@
 import streamlit as st
-
-
+from src.scrapping_engine import scrap_image_urls, scrap_word_content
+from src.models import save_url_to_db
 
 st.title("NSFW | Main Page")
 
-title = st.text_input('URL Link to Scan', 'https://wattlecorp.com')
+main_url = st.text_input('URL Link to Scan', 'https://wattlecorp.com')
 # Add URL Checker python module or regex
 
-st.button("Reset", type="primary")
-if st.button('Say hello'):
-    st.write('Why hello there')
+if st.button('Scan the URL'):
+    # save_url_to_db(main_url)
+    # print('URL Saved to DB')
+    # Image_resp = scrap_image_urls(main_url)
+    Text_resp = scrap_word_content(main_url)
+    # st.write(Image_resp)
+    st.write(Text_resp)
+
+
 else:
-    st.write('Goodbye')
+    st.write('Click to scan')
 
-
+# TODO : Add a button to force scan the URL
