@@ -34,12 +34,13 @@ def scrap_image_urls(url):
             #  TODO or img_url.startswith("/")/ Integrate this later 
             image_no = len(valid_img_urls)
             # Display the list of image URLs
-            for img_url in valid_img_urls:
+            for idx,img_url in enumerate(valid_img_urls):
                 image = download_image(img_url)
                 image_base64_str = base64.b64encode(image).decode('utf-8')
                 print("[+] Found image:", img_url)
                 payload = {
                     'site': str(url),
+                    'image_count': str(str(idx+1)+'/'+str(image_no)),
                     'image_data': image_base64_str
                 }
                 payload_bytes = json.dumps(payload).encode('utf-8') # Convert the payload to JSON bytes as Rabbit loves bytes
