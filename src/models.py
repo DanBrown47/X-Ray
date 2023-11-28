@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import pandas as pd
 
 def init():
     try:
@@ -58,6 +59,33 @@ def save_url_to_db(url):
     finally:
             cursor.close()
             connection.close()
+
+def get_from_db_all_values():
+    """
+    Fetch all values from a specified table in a SQLite database and display them in a table format.
+
+    Parameters:
+    - db_path (str): Path to the SQLite database file.
+    - table_name (str): Name of the table to fetch values from.
+
+    Returns:
+    - pd.DataFrame: A Pandas DataFrame containing all the values from the specified table.
+    """
+
+    # Connect to the SQLite database
+    connection = init()
+
+    # Query to fetch all values from the specified table
+    query = f"SELECT * FROM main;"
+
+    # Execute the query and fetch the results
+    result = pd.read_sql_query(query, connection)
+
+    # Close the database connection
+    connection.close()
+
+    return result
+     
 
 if __name__ == "__main__":
     save_url_to_db("https://catipowero.com")

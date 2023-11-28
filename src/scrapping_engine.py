@@ -1,18 +1,21 @@
 import requests
 from bs4 import BeautifulSoup
+from src.offshore import send_to_queue_text, send_to_queue_image
 import re
+import json
+import base64
 
 
-#link, media, resources
+# Also covert to Base64
 def download_image(url):
-    pass    
-
-
-def put_to_queue(url, data, type):
-    if type == 'text':
-        pass
-    else:
-        pass
+    try:
+        response = requests.get(url)
+        content = response.content  # Assuming the content is in UTF-8 encoding
+        # content = base64.b64encode(content)
+        return content  # Return the content and no error
+    except Exception as e:
+        print(f"Error downloading content from {url}: {e}")
+        return None
 
 def scrap_image_urls(url):
     try:
@@ -32,8 +35,16 @@ def scrap_image_urls(url):
             image_no = len(valid_img_urls)
             # Display the list of image URLs
             for img_url in valid_img_urls:
-                print(img_url)
-        
+                image = download_image(img_url)
+                image_base64_str = base64.b64encode(image).decode('utf-8')
+                print("[+] Found image:", img_url)
+                payload = {
+                    'site': str(url),
+                    'image_data': image_base64_str
+                }
+                payload_bytes = json.dumps(payload).encode('utf-8') # Convert the payload to JSON bytes as Rabbit loves bytes
+                print(type(payload_bytes))
+                send_to_queue_image(payload_bytes)
             return_msg = f"Found {image_no} images in the webpage | Moving to the queue"
 
         else:
@@ -61,9 +72,12 @@ def scrap_word_content(url):
             words = re.findall(r'\b\w+\b', text_content)
             # Send as a single request for all the words
             
-            # Display the list of words
-            for idx, word in enumerate(words):
-                print(idx, word)
+            # JSONify the list of words
+            json_data = {str(idx): animal for idx, animal in enumerate(words)}
+            json_data['site'] = url
+            json_data = json.dumps(json_data)
+
+            send_to_queue_text(json_data)
             return_msg = f"Found {len(words)} words in the webpage | Moving to the queue"
         else:
             print("Failed to retrieve the webpage. Status code:", response.status_code)
