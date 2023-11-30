@@ -87,11 +87,11 @@ def get_from_db_all_values():
 
     return result
      
-def update_text_db(site, score):
+def update_db(site, score, column):
     connection = init()
     try:
         cursor = connection.cursor()
-        query = f"UPDATE main SET text_value = {score} WHERE url = '{site}';"
+        query = f"UPDATE main SET {column} = {score} WHERE url = '{site}';"
         cursor.execute(query)
         connection.commit()
         print("Data updated to DB successfully")

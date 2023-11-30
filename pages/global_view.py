@@ -1,5 +1,5 @@
 import streamlit as st
-from src.models import get_from_db_all_values, update_text_db
+from src.models import get_from_db_all_values, update_db
 import pika
 import json
 
@@ -19,10 +19,10 @@ def get_queue_size(queue_name):
 result = get_from_db_all_values()
 st.dataframe(result)
 
-def get_all_messages_txt():
+def get_all_messages(queue):
     messages = []
     while True:
-        method_frame, header_frame, body = channel.basic_get(queue=RABBITMQ_TEXT_SCORE, auto_ack=False)
+        method_frame, header_frame, body = channel.basic_get(queue=queue, auto_ack=False)
         if method_frame:
             messages.append(body.decode('utf-8'))
             # Acknowledge the message to remove it from the queue
@@ -40,9 +40,10 @@ if st.button("Re-scan"):
     txt_queue_size = get_queue_size(RABBITMQ_TEXT_SCORE) #TODO : move this to env
     img_queue_size = get_queue_size(RABBITMQ_IMAGE_SCORE) #TODO : move this to env
     st.write(str(txt_queue_size)+" Text(s) are in the queue")
+    st.write(str(img_queue_size)+" Image(s) are in the queue")
 
 
-    txt_messages = get_all_messages_txt()
+    txt_messages = get_all_messages(RABBITMQ_TEXT_SCORE)
     for message in txt_messages:
         message = json.loads(message)
         # st.write(type(message))
@@ -50,8 +51,15 @@ if st.button("Re-scan"):
         site = message['url']
         score = message['score']
         print(site, score)
-        update_text_db(site, score)
-    # update_text_db(site, score)
+        update_db(site, score, "text_value")
+    
+    img_messages = get_all_messages(RABBITMQ_IMAGE_SCORE)
+    for message in img_messages:
+        message = json.loads(message)
+        site = message['url']
+        score = message['score']
+        print(site, score)
+        update_db(site, score, "image_value")
 
 
 
