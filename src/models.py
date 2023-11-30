@@ -17,9 +17,9 @@ def init():
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS main (
         id SERIAL PRIMARY KEY,
-        url VARCHAR(100),
-        image_value INT,
-        text_value INT,
+        url VARCHAR(1000),
+        image_value FLOAT,
+        text_value FLOAT,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """
@@ -29,7 +29,6 @@ def init():
         # Commit the transaction
         connection.commit()
 
-        print("Table Main Created")
         return connection
     except Exception as e:
         print(f"error : {str(e)}")
@@ -86,6 +85,19 @@ def get_from_db_all_values():
 
     return result
      
+def update_text_db(site, score):
+    connection = init()
+    try:
+        cursor = connection.cursor()
+        query = f"UPDATE main SET text_value = {score} WHERE url = '{site}';"
+        cursor.execute(query)
+        connection.commit()
+        print("Data updated to DB successfully")
+    except Exception as e:
+        print(f"Error updating data: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()
 
 if __name__ == "__main__":
     save_url_to_db("https://catipowero.com")
