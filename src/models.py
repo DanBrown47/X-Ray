@@ -1,15 +1,17 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import pandas as pd
+import streamlit as st
+from config import DB_HOST, DB_PORT, DB_NAME, DB_PASSWORD, DB_USER
 
 def init():
     try:
         connection = psycopg2.connect(
-        database="postgres",
-        user="username",
-        password="password",
-        host="127.0.0.1",
-        port="5432"
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
     )
 
         cursor = connection.cursor()

@@ -1,14 +1,15 @@
 import pika
 import json
-
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost')) #TODO : move the localhost to env,
+import streamlit as st
+from config import RABBITMQ_ENDPOINT, RABBITMQ_TEXT_QUEUE, RABBITMQ_IMAGE_QUEUE
+connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_ENDPOINT)) 
 channel = connection.channel()
 
 # Declare a queue
-queue_name_txt = 'text_queue' #TODO : move this to env
+queue_name_txt = RABBITMQ_TEXT_QUEUE
 channel.queue_declare(queue=queue_name_txt)
 
-queue_name = 'image_queue' #TODO : move this to env
+queue_name = RABBITMQ_IMAGE_QUEUE
 channel.queue_declare(queue=queue_name)
 
 def send_to_queue_text(data):
