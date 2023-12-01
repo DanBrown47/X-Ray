@@ -56,7 +56,7 @@ if st.button("Re-scan"):
     img_messages = get_all_messages(RABBITMQ_IMAGE_SCORE)
     for message in img_messages:
         message = json.loads(message)
-        site = message['url']
+        site = message['site']
         score = message['score']
         print(site, score)
         update_db(site, score, "image_value")
